@@ -54,7 +54,7 @@ jobs:
       
 
   deploy:
-    needs: build_ci
+    needs: build-ci
     runs-on: ubuntu-latest
     environment: dev
     steps:
