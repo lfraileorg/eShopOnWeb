@@ -1,9 +1,21 @@
-name: eShopOnWeb Build and Test
+name: CI/CD Example
 
-on: [push, pull_request, workflow_dispatch]
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main ]
+    paths: 
+      - .github/workflows/ci-cd.yml
+      - src/**
+
+env:
+  registry_name: jramgar.azurecr.io
+  repository_name: eshop-web-demo
 
 jobs:
-  build:
+  build-ci:
 
     runs-on: ubuntu-latest
 
@@ -20,6 +32,19 @@ jobs:
     - name: Test with dotnet
       run: dotnet test ./eShopOnWeb.sln --configuration Release
 
+    - name: Build docker image
+      uses: docker/build-push-action@v1.1.1
+      with:
+        registry: ${{ env.registry_name }}
+        username: ${{ secrets.ACR_USER_NAME }}
+        password: ${{ secrets.ACR_PASSWORD }}
+        repository: ${{ env.repository_name }}
+        tags: ${{ github.sha }}
+        path: .
+        dockerfile: src/Web/Dockerfile
+        add_git_labels: true
+        cache-from: type=local,src=/tmp/.buildx-cache
+        cache-to: type=local,dest=/tmp/.buildx-cache
     
   # dockerize:
   #   runs-on: ubuntu-latest
@@ -28,8 +53,10 @@ jobs:
   #   - ta
       
 
-  infrastructure:
+  deploy:
+    needs: build_ci
     runs-on: ubuntu-latest
+    environment: dev
     steps:
       - name: Azure Login
         uses: azure/login@v1
