@@ -75,6 +75,7 @@ jobs:
     needs: 
       - build-web-image
       - build-api-image
+
     runs-on: ubuntu-latest
     environment: dev
     steps:
