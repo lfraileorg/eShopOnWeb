@@ -38,6 +38,7 @@ jobs:
     needs: build-ci
 
     steps:
+    - uses: actions/checkout@v2
     - name: Build docker image
       uses: docker/build-push-action@v1.1.1
       with:
@@ -57,6 +58,7 @@ jobs:
     needs: build-ci
 
     steps:
+    - uses: actions/checkout@v2
     - name: Build docker image
       uses: docker/build-push-action@v1.1.1
       with:
